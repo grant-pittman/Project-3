@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Multi-Trace</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  
+</head>
+<body>
+  <div id="plot"></div>
+  <script src="../app.js"></script>
+  {% for country in country %}
+    <p><strong>{{country.rank}}</strong></p>
+    <p> {{country.country}} </p> 
+    <p> {{country.score}} </p> 
+    <p> {{country.year}} </p> 
+  {% endfor %}
+</body>
+</html>
