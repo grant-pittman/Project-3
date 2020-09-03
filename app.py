@@ -5,7 +5,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 import datetime as dt
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 
 #################################################
@@ -57,12 +57,20 @@ def most_happy(year):
 
     return jsonify(all_countries)
 
-@app.route("/api/v1.0/<rank>")
-def one_country(rank):
+@app.route("/api/v1.0/rank/<rank>")
+def one_rank(rank):
 
-   results = session.query(happiness.rank, happiness.country, happiness.score).filter(happiness.rank == rank).all()
+   results = session.query(happiness.rank, happiness.country, happiness.score, happiness.year).filter(happiness.rank == rank).all()
    country_list = list(results)
    return jsonify(country_list)
+   
+@app.route("/api/v1.0/country/<country>")
+def one_country(country):
+   
+   capitalized = country.capitalize()
+   results = session.query(happiness.rank, happiness.country, happiness.score, happiness.year).filter(happiness.country == capitalized).all()
+   #country_list = list(results) 
+   return render_template("index.html", country=results)
    
 if __name__ == '__main__':
     app.run(debug=True)
@@ -71,3 +79,4 @@ if __name__ == '__main__':
 # CODE TO USE LATER
 # trip_data = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
 #        filter(Measurement.date >= country).filter(Measurement.date <= end).filter(Measurement.station == 'USC00519281').all()
+
