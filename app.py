@@ -1,5 +1,5 @@
 import numpy as np
-
+import json
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -52,15 +52,17 @@ def welcome():
         data_dict['Long']= long
         data_list.append(data_dict)
         data_dict = {}
-        
-    return jsonify(data_list)
+    
+    ###run this the first time only
+    # with open('data.json', 'w') as f:
+    #     json.dump(data_list, f)
+    
+    return("Please check the file system now")
 
 @app.route("/website")
 def website():
     return render_template("index.html")
     
-
-
 @app.route("/api/v1.0/happiest_countries/<year>")
 def most_happy(year):
     results = session.query(happiness.rank, happiness.country, happiness.score).filter(happiness.year == year).all()
