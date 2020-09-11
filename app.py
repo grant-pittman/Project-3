@@ -32,7 +32,7 @@ app = Flask(__name__)
 # Flask Routes
 #################################################
 
-@app.route("/")
+@app.route("/data")
 def welcome():
     results = session.query(happiness.country, happiness.rank, happiness.score, happiness.economy, happiness.family, happiness.health, happiness.freedom, happiness.generosity, happiness.trust, happiness.year, happiness.lat, happiness.long).all()
     data_dict = {}
@@ -53,13 +53,9 @@ def welcome():
         data_list.append(data_dict)
         data_dict = {}
     
-    ###run this the first time only
-    # with open('data.json', 'w') as f:
-    #     json.dump(data_list, f)
-    
-    return("Please check the file system now")
+    return jsonify(data_list)
 
-@app.route("/website")
+@app.route("/")
 def website():
     return render_template("index.html")
     
