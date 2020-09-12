@@ -22,7 +22,10 @@ d3.json("/data").then(function (data) {
             { from: 5.5, to: 7 },
             { greater: 7 }
         ]);
-        customColorScale.colors(["lightgray", "#9ED1DE", "#00CCFF", "#FFCC00"]);
+        
+        customColorScale.colors(["#FF0000", "#FAA106", "#84FA06", "#0CBA0F"]);
+
+
         // set the color scale as the color scale of the chart
         chart.colorScale(customColorScale);
         // add a color range
@@ -51,7 +54,7 @@ d3.json("/data").then(function (data) {
       var xLinearScale = xScale(data, chosenXAxis);
       // Create y scale function
       var yLinearScale = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.score)])
+        .domain([0, d3.max(data, d => d.score+ 0.5)])
         .range([height, 0]);
       // Create initial axis functions
       var bottomAxis = d3.axisBottom(xLinearScale);
@@ -71,8 +74,8 @@ d3.json("/data").then(function (data) {
         .append("circle")
         .attr("cx", d => xLinearScale(d[chosenXAxis]))
         .attr("cy", d => yLinearScale(d.score))
-        .attr("r", 12)
-        .attr("fill", "lightblue")
+        .attr("r", 5.5)
+        .attr("fill", "dodgerblue")
         .attr("opacity", ".5");
       // Create group for three x-axis labels
       var labelsGroup = chartGroup.append("g")
@@ -120,6 +123,7 @@ d3.json("/data").then(function (data) {
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .classed("axis-text", true)
+        .classed("active", true)
         .text("Happiness Score");
       // updateToolTip function above csv import
       var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
@@ -139,7 +143,7 @@ d3.json("/data").then(function (data) {
             // updates circles with new x values
             circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
             // updates tooltips with new info
-            //circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+            circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
             // changes classes to change bold text
             if (chosenXAxis === "health") {
               healthLabel
@@ -347,8 +351,10 @@ function updateToolTip(chosenXAxis, circlesGroup) {
     label = "Trust Score:"
   }
   var toolTip = d3.tip()
-    .attr("class", "tooltip")
-    .offset([80, -60])
+    .attr("class", "d3-tip")
+    .style("background", "black")
+    .style("color", "white")
+    .offset([80, -20])
     .html(function(d) {
       return (`${d.country}<br>${label} ${d[chosenXAxis]}`);
     });
@@ -362,3 +368,25 @@ function updateToolTip(chosenXAxis, circlesGroup) {
     });
   return circlesGroup;
 }
+function init() {
+    var dropdownMenu = d3.select("#selDataset");
+    // Assign the value of the dropdown menu option to a variable
+    
+    d3.json("/data").then(function(data){
+    
+        data.forEach(function(d) {
+            
+            dropdownMenu.append("option").text(d.Country).property("value");	
+        
+        });
+
+        // barPlot(data.samples[0].id);
+        // demInfo(data.samples[0].id);
+        // bubbleChart(data.samples[0].id);
+	});
+}
+
+//initializing with a standin value 
+init();
+
+
