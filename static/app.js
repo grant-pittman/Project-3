@@ -32,6 +32,238 @@ d3.json("/data").then(function (data) {
         chart.draw();
     }
     )
+
+    data.forEach(function(data) {
+        data.country = data.Country;
+        data.rank = data.Rank;
+        data.score = +data.Score;
+        data.economy = +data.Economy;
+        data.family = +data.Family;
+        data.health = +data.Health;
+        data.freedom = +data.Freedom;
+        data.generosity = +data.Generosity;
+        data.trust = +data.Trust;
+        data.year = +data.Year;
+        data.lat = +data.Lat;
+        data.long = +data.Long;
+      });
+      // xLinearScale function 
+      var xLinearScale = xScale(data, chosenXAxis);
+      // Create y scale function
+      var yLinearScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.score)])
+        .range([height, 0]);
+      // Create initial axis functions
+      var bottomAxis = d3.axisBottom(xLinearScale);
+      var leftAxis = d3.axisLeft(yLinearScale);
+      // append x axis
+      var xAxis = chartGroup.append("g")
+        .classed("x-axis", true)
+        .attr("transform", `translate(0, ${height})`)
+        .call(bottomAxis);
+      // append y axis
+      chartGroup.append("g")
+        .call(leftAxis);
+      // append initial circles
+      var circlesGroup = chartGroup.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", d => xLinearScale(d[chosenXAxis]))
+        .attr("cy", d => yLinearScale(d.score))
+        .attr("r", 12)
+        .attr("fill", "lightblue")
+        .attr("opacity", ".5");
+      // Create group for three x-axis labels
+      var labelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${width / 2}, ${height + 20})`);
+      var healthLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 20)
+        .attr("value", "health") // value to grab for event listener
+        .classed("active", true)
+        .text("Health");
+      var freedomLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 40)
+        .attr("value", "freedom") // value to grab for event listener
+        .classed("inactive", true)
+        .text("Freedom");
+      var generosityLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 60)
+        .attr("value", "generosity") // value to grab for event listener
+        .classed("inactive", true)
+        .text("Generosity");
+      var familyLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 80)
+        .attr("value", "family") // value to grab for event listener
+        .classed("inactive", true)
+        .text("Family");
+      var trustLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 100)
+        .attr("value", "trust") // value to grab for event listener
+        .classed("inactive", true)
+        .text("Trust");
+      var economyLabel = labelsGroup.append("text")
+        .attr("x", 0)
+        .attr("y", 120)
+        .attr("value", "economy") // value to grab for event listener
+        .classed("inactive", true)
+        .text("Economy");
+      // append y axis
+      chartGroup.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .classed("axis-text", true)
+        .text("Happiness Score");
+      // updateToolTip function above csv import
+      var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+      // x axis labels event listener
+      labelsGroup.selectAll("text")
+        .on("click", function() {
+          // get value of selection
+          var value = d3.select(this).attr("value");
+          if (value !== chosenXAxis) {
+            // replaces chosenXAxis with value
+            chosenXAxis = value;
+            console.log(chosenXAxis);
+            // updates x scale for new data
+            xLinearScale = xScale(data, chosenXAxis);
+            // updates x axis with transition
+            xAxis = renderAxes(xLinearScale, xAxis);
+            // updates circles with new x values
+            circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+            // updates tooltips with new info
+            //circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+            // changes classes to change bold text
+            if (chosenXAxis === "health") {
+              healthLabel
+                .classed("active", true)
+                .classed("inactive", false);
+              freedomLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              generosityLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              familyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              trustLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              economyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+            }
+            else if (chosenXAxis === "generosity"){
+              healthLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              freedomLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              generosityLabel
+                .classed("active", true)
+                .classed("inactive", false);
+              familyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              trustLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              economyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+            }
+            else if (chosenXAxis === "freedom"){
+              healthLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              freedomLabel
+                .classed("active", true)
+                .classed("inactive", false);
+              generosityLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              familyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              trustLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              economyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+            }
+            else if (chosenXAxis === "family"){
+              healthLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              freedomLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              generosityLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              familyLabel
+                .classed("active", true)
+                .classed("inactive", false);
+              trustLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              economyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+            }
+            else if (chosenXAxis === "trust"){
+              healthLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              freedomLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              generosityLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              familyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              trustLabel
+                .classed("active", true)
+                .classed("inactive", false);
+              economyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+            }
+            else {
+              healthLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              freedomLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              generosityLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              familyLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              trustLabel
+                .classed("active", false)
+                .classed("inactive", true);
+              economyLabel
+                .classed("active", true)
+                .classed("inactive", false);
+            }
+          }
+        });
+    
 });
 
 // Creating map object
@@ -49,3 +281,84 @@ var myMap = L.map("map", {
     id: "mapbox/streets-v11",
     accessToken: "pk.eyJ1IjoiZ3JhbnRwbWFuIiwiYSI6ImNrZWZzN3puZDBwa3cydHBxNGNnbzRtcGYifQ.R1d3p537y4KhE_gVOHh1sg"
   }).addTo(myMap);
+
+  
+
+var svgWidth = 960;
+var svgHeight = 600;
+var margin = {
+  top: 20,
+  right: 40,
+  bottom: 200,
+  left: 100
+};
+var width = svgWidth - margin.left - margin.right;
+var height = svgHeight - margin.top - margin.bottom;
+// Create an SVG wrapper, append an SVG group that will hold our chart,
+// and shift the latter by left and top margins.
+var svg = d3
+  .select(".chart")
+  .append("svg")
+  .attr("width", svgWidth)
+  .attr("height", svgHeight);
+// Append an SVG group
+var chartGroup = svg.append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+// Initial Params
+var chosenXAxis = "health";
+// function used for updating x-scale var upon click on axis label
+function xScale(data, chosenXAxis) {
+  // create scales
+  var xLinearScale = d3.scaleLinear()
+    .domain([d3.min(data, d => d[chosenXAxis] *.8),
+      d3.max(data, d => d[chosenXAxis]) * 1.2
+    ])
+    .range([0, width]);
+  return xLinearScale;
+}
+// function used for updating xAxis var upon click on axis label
+function renderAxes(newXScale, xAxis) {
+  var bottomAxis = d3.axisBottom(newXScale);
+  xAxis.transition()
+    .duration(1000)
+    .call(bottomAxis);
+  return xAxis;
+}
+// function used for updating circles group with a transition to
+// new circles
+function renderCircles(circlesGroup, newXScale, chosenXAxis) {
+  circlesGroup.transition()
+    .duration(1000)
+    .attr("cx", d => newXScale(d[chosenXAxis]));
+  return circlesGroup;
+}
+//function used for updating circles group with new tooltip
+function updateToolTip(chosenXAxis, circlesGroup) {
+  var label;
+  if (chosenXAxis === "health") {
+    label = "Health Score:";
+  } else if (chosenXAxis === "freedom") {
+    label = "Freedom Score:";
+  } else if (chosenXAxis === "generosity") {
+    label = "Generosity Score:";
+  } else if (chosenXAxis === "family") {
+    label = "Family Score:";
+  } else {
+    label = "Trust Score:"
+  }
+  var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .offset([80, -60])
+    .html(function(d) {
+      return (`${d.country}<br>${label} ${d[chosenXAxis]}`);
+    });
+  circlesGroup.call(toolTip);
+  circlesGroup.on("mouseover", function(data) {
+    toolTip.show(data);
+  })
+    // onmouseout event
+    .on("mouseout", function(data, index) {
+      toolTip.hide(data);
+    });
+  return circlesGroup;
+}
