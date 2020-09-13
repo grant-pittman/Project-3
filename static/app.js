@@ -1,19 +1,19 @@
 d3.json("/data").then(function (data) {
-    console.log(data);
+    // console.log(data);
     latest_year_data = data.filter(data => data.Year == 2019);
-    console.log(latest_year_data);
+    // console.log(latest_year_data);
     var countries_score_2019 = []
     latest_year_data.forEach(item => {
         country = item.Country;
         score = item.Score
         countries_score_2019.push({ 'name': country, 'value': score });
     });
-    console.log(countries_score_2019);
+    // console.log(countries_score_2019);
     anychart.onDocumentReady(function () {
         var tree_data = [
             { name: "Country Happiness", children: countries_score_2019 }
         ];
-        console.log(tree_data);
+        // console.log(tree_data);
         var chart = anychart.treeMap(tree_data, "as-tree");
         var customColorScale = anychart.scales.ordinalColor();
         customColorScale.ranges([
@@ -135,7 +135,7 @@ d3.json("/data").then(function (data) {
           if (value !== chosenXAxis) {
             // replaces chosenXAxis with value
             chosenXAxis = value;
-            console.log(chosenXAxis);
+            // console.log(chosenXAxis);
             // updates x scale for new data
             xLinearScale = xScale(data, chosenXAxis);
             // updates x axis with transition
@@ -380,13 +380,62 @@ function init() {
         
         });
 
-        // barPlot(data.samples[0].id);
+        barPlot(data[0].Country);
         // demInfo(data.samples[0].id);
         // bubbleChart(data.samples[0].id);
 	});
 }
 
+function barPlot(Country) {
+		
+		
+    d3.json("/data").then(function(data){
+        var sample_data = data.filter(s => s.Country === Country);
+        // console.log(sample_data);
+        
+        var years = [];
+        var scores = [];
+
+        sample_data.forEach(function(d){
+            year = d.Year;
+            score = d.Score;
+
+            years.push(year);
+            scores.push(score);
+        })
+        
+        // console.log(years);
+        // console.log(scores);
+
+        var trace = {
+            x: years,
+            y: scores,
+            type: "line",
+        };
+
+        var data = [trace];
+        var title = `${Country}'s Score Over The Years`;
+
+        var layout = {
+            title: title
+            
+        };
+
+        Plotly.newPlot("bar", data, layout);
+    });
+};
+
 //initializing with a standin value 
 init();
 
+d3.selectAll("#selDataset").on("change", updatePlotly);
+
+function updatePlotly(){
+    var dropID = d3.select("#selDataset");
+    var Country = dropID.node().value;
+
+    //the other functions are called anytime there is a change to update the graphics
+    barPlot(Country);
+
+};
 
