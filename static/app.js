@@ -270,22 +270,195 @@ d3.json("/data").then(function (data) {
     
 });
 
-// Creating map object
-// Creating map object
-var myMap = L.map("map", {
-    center: [40.7128, -74.0059],
-    zoom: 11
-  });
-  // Adding tile layer
-  L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-    tileSize: 512,
+const lightmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>",
     maxZoom: 18,
-    zoomOffset: -1,
-    id: "mapbox/streets-v11",
-    accessToken: "pk.eyJ1IjoiZ3JhbnRwbWFuIiwiYSI6ImNrZWZzN3puZDBwa3cydHBxNGNnbzRtcGYifQ.R1d3p537y4KhE_gVOHh1sg"
-  }).addTo(myMap);
-
+    id: "mapbox.light",
+    accessToken: 'pk.eyJ1IjoicmluZ290bSIsImEiOiJja2VhbHQycDkwMDNpMnhyeTF2bXkzNHdsIn0.0z2sYcvbh0t_X0uFobRNvA'
+});
+const layers = {
+    layer2015: new L.LayerGroup(),
+    layer2016: new L.LayerGroup(),
+    layer2017: new L.LayerGroup(),
+    layer2018: new L.LayerGroup(),
+    layer2019: new L.LayerGroup(),
+}
+const map = L.map("map", {
+    center: [40.73, -74.0059],
+    zoom: 12,
+    layers: [layers.layer2019]
+});
+lightmap.addTo(map);
+const overlays = {
+    '2015': layers.layer2015,
+    '2016': layers.layer2016,
+    '2017': layers.layer2017,
+    '2018': layers.layer2018,
+    '2019': layers.layer2019
+};
+const icons = {
+    Happy: L.ExtraMarkers.icon({
+        icon: "fa-smile",
+        iconColor: 'green',
+        markerColor: 'green',
+        prefix: 'fa',
+    }),
+    Content: L.ExtraMarkers.icon({
+        icon: "fa-meh",
+        iconColor: 'yellow',
+        markerColor: 'yellow',
+        prefix: 'fa'
+    }),
+    Unhappy: L.ExtraMarkers.icon({
+        icon: "fa-frown",
+        iconColor: 'red',
+        markerColor: 'red',
+        prefix: 'fa'
+    })
+};
+L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+// Create a legend to display information about our map
+const info = L.control({
+    position: "bottomright"
+});
+// When the layer control is added, insert a div with the class of "legend"
+info.onAdd = function () {
+    const div = L.DomUtil.create("div", "legend");
+    return div;
+};
+// Add the info legend to the map
+info.addTo(map);
+d3.json("/data").then(function (data) {
+    console.log(data);
+    latest_year_data = data.filter(data => data.Year == 2019);
+    console.log(latest_year_data);
+    var countries_score_2019 = []
+    let happinessCategory;
+    latest_year_data.forEach(item => {
+        country = item.Country;
+        score = item.Score
+        countries_score_2019.push({ 'name': country, 'value': score });
+        if (item.Score >= 7) {
+            happinessCategory = 'Happy'
+        }
+        else if (item.Score >= 4.5) {
+            happinessCategory = 'Content'
+        }
+        else {
+            happinessCategory = 'Unhappy'
+        }
+        if (item.Lat != null) {
+            const newMarker = L.marker([item.Lat, item.Long], {
+                icon: icons[happinessCategory]
+            })
+            newMarker.addTo(layers["layer2019"]);
+            newMarker.bindPopup(item.Country + "<br> Happiness Score: " + item.Score);
+        }
+    });
+    data_2015 = data.filter(data => data.Year == 2015);
+    // let happinessCategory;
+    data_2015.forEach(item => {
+        if (item.Score >= 7) {
+            happinessCategory = 'Happy'
+        }
+        else if (item.Score >= 4.5) {
+            happinessCategory = 'Content'
+        }
+        else {
+            happinessCategory = 'Unhappy'
+        }
+        if (item.Lat != null) {
+            const newMarker = L.marker([item.Lat, item.Long], {
+                icon: icons[happinessCategory]
+            })
+            newMarker.addTo(layers["layer2015"]);
+            newMarker.bindPopup(item.Country + "<br> Happiness Score: " + item.Score);
+        }
+    });
+    data_2016 = data.filter(data => data.Year == 2016);
+    //let happinessCategory;
+    data_2016.forEach(item => {
+        if (item.Score >= 7) {
+            happinessCategory = 'Happy'
+        }
+        else if (item.Score >= 4.5) {
+            happinessCategory = 'Content'
+        }
+        else {
+            happinessCategory = 'Unhappy'
+        }
+        if (item.Lat != null) {
+            const newMarker = L.marker([item.Lat, item.Long], {
+                icon: icons[happinessCategory]
+            })
+            newMarker.addTo(layers["layer2016"]);
+            newMarker.bindPopup(item.Country + "<br> Happiness Score: " + item.Score);
+        }
+    });
+    data_2017 = data.filter(data => data.Year == 2017);
+    //let happinessCategory;
+    data_2017.forEach(item => {
+        if (item.Score >= 7) {
+            happinessCategory = 'Happy'
+        }
+        else if (item.Score >= 4.5) {
+            happinessCategory = 'Content'
+        }
+        else {
+            happinessCategory = 'Unhappy'
+        }
+        if (item.Lat != null) {
+            const newMarker = L.marker([item.Lat, item.Long], {
+                icon: icons[happinessCategory]
+            })
+            newMarker.addTo(layers["layer2017"]);
+            newMarker.bindPopup(item.Country + "<br> Happiness Score: " + item.Score);
+        }
+    });
+    data_2018 = data.filter(data => data.Year == 2018);
+    //let happinessCategory;
+    data_2018.forEach(item => {
+        if (item.Score >= 7) {
+            happinessCategory = 'Happy'
+        }
+        else if (item.Score >= 4.5) {
+            happinessCategory = 'Content'
+        }
+        else {
+            happinessCategory = 'Unhappy'
+        }
+        if (item.Lat != null) {
+            const newMarker = L.marker([item.Lat, item.Long], {
+                icon: icons[happinessCategory]
+            })
+            newMarker.addTo(layers["layer2018"]);
+            newMarker.bindPopup(item.Country + "<br> Happiness Score: " + item.Score);
+        }
+    });
+    anychart.onDocumentReady(function () {
+        var tree_data = [
+            { name: "Country Happiness", children: countries_score_2019 }
+        ];
+        console.log(tree_data);
+        var chart = anychart.treeMap(tree_data, "as-tree");
+        var customColorScale = anychart.scales.ordinalColor();
+        customColorScale.ranges([
+            { less: 4 },
+            { from: 4, to: 5.5 },
+            { from: 5.5, to: 7 },
+            { greater: 7 }
+        ]);
+        customColorScale.colors(["#FF0000", "#FAA106", "#84FA06", "#0CBA0F"]);
+        // set the color scale as the color scale of the chart
+        chart.colorScale(customColorScale);
+        // add a color range
+        chart.colorRange().enabled(true);
+        chart.colorRange().length("100%");
+        chart.container('container');
+        chart.draw();
+    }
+    )
+});
 
   
 
