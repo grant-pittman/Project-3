@@ -458,7 +458,10 @@ legend.onAdd = function (map) {
 };
 legend.addTo(map);
 
-L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+
+L.control.layers(overlays, null, { collapsed: false }).addTo(map);
+
+
 // Create a legend to display information about our map
 const info = L.control({
     position: "bottomright"
