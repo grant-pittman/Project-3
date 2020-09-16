@@ -108,3 +108,11 @@ body {
     background-size: 18px;
     background-color: rgba(255, 255, 255, 1);
   }
+
+  #selDataset {
+      padding-right: 30px;
+  }
+
+  #bar {
+      margin-left: 30px;
+  }
